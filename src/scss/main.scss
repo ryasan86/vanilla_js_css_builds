@@ -88,12 +88,12 @@ ul {
     }
 }
 
-#invaders__player-zone {
+#player-zone {
     height: $unit-height;
     position: relative;
 }
 
-#invaders__player {
+#player {
     @include base-unit;
 
     left: 500px;

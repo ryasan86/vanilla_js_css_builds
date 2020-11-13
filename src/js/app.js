@@ -1,17 +1,37 @@
-const player = document.querySelector('#invaders__player');
-const columns = Array.from(document.querySelectorAll('.invaders__col'));
+var reqId;
+var p, t, pw, ph, px, py, tw, th, tx, ty;
+var b, bw, bh, bx, by;
 
 const Utils = (() => ({
     getPositionInfo: element => {
         const { left, top, height, width } = element.getBoundingClientRect();
         return { left, top, height, width };
+    },
+    detectCollisions: () => {
+        for (let i = 0; i < t.length; i++) {
+            bw = b.offsetWidth;
+            bh = b.offsetHeight;
+            bx = b.offsetLeft;
+            by = b.offsetTop;
+            tw = t[i].offsetWidth;
+            th = t[i].offsetHeight;
+            tx = t[i].offsetLeft;
+            ty = t[i].offsetTop;
+
+            if (bx + bw > tx && bx < tx + tw && by + bh > ty && by < ty + th) {
+                console.log('Collision detected with ' + t[i]);
+                document.body.removeChild(t[i]);
+            }
+        }
+
+        requestAnimationFrame(Utils.detectCollisions);
     }
 }))();
 
 const Fire = (() => ({
     start: () => {
-        player.innerHTML = '<div class="bullet"></div>';
-        const bullet = player.firstElementChild;
+        p.innerHTML = '<div class="bullet"></div>';
+        const bullet = p.firstElementChild;
         const timer = setInterval(frame, 5);
         let pos = 0;
 
@@ -21,7 +41,6 @@ const Fire = (() => ({
         }
     },
     stop: timer => {
-        player.innerHTML = '';
         clearInterval(timer);
     }
 }))();
@@ -35,48 +54,50 @@ const Observer = (() => {
     };
 })();
 
-let reqId;
-
 const Actions = (() => ({
     direction: null,
     pos: 500,
     changeDirection: ({ direction }) => (Actions.direction = direction),
+    stopAnimation: () => cancelAnimationFrame(reqId),
     startAnimation: () => {
         Actions.stopAnimation();
 
-        if (Actions.direction === 'left') {
-            player.style.left = (player.offsetLeft -= 5) + 'px';
-        } else if (Actions.direction === 'right') {
-            player.style.left = (player.offsetLeft += 5) + 'px';
-        }
+        if (Actions.direction === 'left')
+            p.style.left = (p.offsetLeft -= 5) + 'px';
+
+        if (Actions.direction === 'right')
+            p.style.left = (p.offsetLeft += 5) + 'px';
 
         reqId = requestAnimationFrame(Actions.startAnimation);
 
-        if (player.offsetLeft <= 0 || player.offsetLeft >= 1000) {
-            Actions.stopAnimation();
-        }
-    },
-    stopAnimation: () => {
-        cancelAnimationFrame(reqId);
+        if (p.offsetLeft <= 0 || p.offsetLeft >= 1000) Actions.stopAnimation();
     }
 }))();
 
 Observer.add(Actions.changeDirection, Actions.startAnimation);
 
 (() => {
-    const onMovePlayer = e => {
+    const onKeydown = e => {
         if (e.keyCode === 37) Observer.notify({ direction: 'left' });
         if (e.keyCode === 39) Observer.notify({ direction: 'right' });
-    };
-
-    const onFire = e => {
+        if (e.keyCode === 40) Actions.stopAnimation();
         if (e.keyCode === 32) Fire.start();
     };
 
-    window.addEventListener('keydown', onMovePlayer);
-    window.addEventListener('keydown', onFire);
-
-    columns.forEach(col => {
+    Array.from(document.querySelectorAll('.invaders__col')).forEach(col => {
         col.innerHTML = `<div class="invader"></div>`;
     });
+
+    const docReady = () => {
+        p = document.getElementById('player');
+        t = document.getElementsByClassName('invader');
+        b = document.querySelector('.bullet');
+
+        console.log(b.offsetWidth, b.offsetHeight, b.offsetTop, b.offsetLeft);
+
+        Utils.detectCollisions();
+    };
+
+    window.addEventListener('keydown', onKeydown);
+    window.addEventListener('load', docReady);
 })();
