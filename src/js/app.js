@@ -1,38 +1,26 @@
-let reqId;
-let p, t, i6, pw, ph, px, py, tw, th, tx, ty;
-let b, bw, bh, bx, by;
+var reqId, dir;
+var p, t, pw, ph, px, py, tw, th, tx, ty;
 
-const Utils = (() => ({
-    getRect: element => {
-        const { left, top, height, width } = element.getBoundingClientRect();
-        return { left, top, height, width };
-    },
-    detectCollisions: () => {
-        for (let i = 0; i < t.length; i++) {
-            pw = p.offsetWidth;
-            ph = p.offsetHeight;
-            px = p.offsetLeft;
-            py = p.offsetTop;
-            tw = t[i].offsetWidth;
-            th = t[i].offsetHeight;
-            tx = t[i].offsetLeft;
-            ty = t[i].offsetTop;
+function detectCollisions () {
+    for (let i = 0; i < t.length; i++) {
+        pw = p.offsetWidth;
+        ph = p.offsetHeight;
+        px = p.offsetLeft;
+        py = p.offsetTop;
+        tw = t[i].offsetWidth;
+        th = t[i].offsetHeight;
+        tx = t[i].offsetLeft;
+        ty = t[i].offsetTop;
+        console.log(pw, ph, px, py);
+        console.log(tw, th, tx, ty);
 
-            if (i === 0) {
-                // console.log('t', Utils.getRect(t));
-                // console.log('b', Utils.getRect(b));
-                // console.log('alien-->', tw, th, tx, ty);
-                // console.log('bullet-->', bw, bh, bx, by);
-            }
-
-            if (px + pw > tx && px < tx + tw && py + ph > ty && py < ty + th) {
-                console.log('Collision detected with ' + t[i].class);
-                document.body.removeChild(t[i]);
-            }
+        if (px + pw > tx && px < tx + tw && py + ph > ty && py < ty + th) {
+            console.log('Collision detected with ' + t[i].id);
+            document.body.removeChild(t[i]);
         }
-        requestAnimationFrame(Utils.detectCollisions);
     }
-}))();
+    window.requestAnimationFrame(detectCollisions);
+}
 
 const Fire = (() => ({
     start: () => {
@@ -42,8 +30,7 @@ const Fire = (() => ({
         let pos = 0;
 
         function frame () {
-            const { offsetHeight, offsetWidth, offsetLeft, offsetTop } = bullet;
-            if (pos > -100) bullet.style.top = --pos + 'vh';
+            if (pos > -800) p.style.top = --pos + 'px';
             else Fire.stop(timer);
         }
     },
@@ -99,7 +86,7 @@ Observer.add(Actions.changeDirection, Actions.startAnimation);
         p = document.querySelector('#player');
         t = document.querySelector('.invader');
 
-        Utils.detectCollisions();
+        detectCollisions();
     };
 
     window.addEventListener('keydown', onKeydown);
