@@ -1,29 +1,46 @@
-var reqId;
-var p, t, pw, ph, px, py, tw, th, tx, ty;
-var b, bw, bh, bx, by;
+let reqId;
+let p, t, t6, pw, ph, px, py, tw, th, tx, ty;
+let b, bw, bh, bx, by;
 
 const Utils = (() => ({
-    getPositionInfo: element => {
+    getRect: element => {
+        console.log(element.getBoundingClientRect)
         const { left, top, height, width } = element.getBoundingClientRect();
         return { left, top, height, width };
     },
     detectCollisions: () => {
-        for (let i = 0; i < t.length; i++) {
-            bw = b.offsetWidth;
-            bh = b.offsetHeight;
-            bx = b.offsetLeft;
-            by = b.offsetTop;
-            tw = t[i].offsetWidth;
-            th = t[i].offsetHeight;
-            tx = t[i].offsetLeft;
-            ty = t[i].offsetTop;
+        const b = p.firstElementChild;
 
-            if (bx + bw > tx && bx < tx + tw && by + bh > ty && by < ty + th) {
-                console.log('Collision detected with ' + t[i]);
-                document.body.removeChild(t[i]);
+        if (b) {
+            for (let i = 0; i < t.length; i++) {
+                bw = b.offsetWidth;
+                bh = b.offsetHeight;
+                bx = b.offsetLeft;
+                by = b.offsetTop;
+                tw = t[i].offsetWidth;
+                th = t[i].offsetHeight;
+                tx = t[i].offsetLeft;
+                ty = t[i].offsetTop;
+
+                if (i === 0) {
+                    // console.log('t', Utils.getRect(t));
+                    // console.log('b', Utils.getRect(b));
+                    // console.log('alien-->', tw, th, tx, ty);
+                    console.log('bullet-->', bw, bh, bx, by);
+                }
+
+                if (
+                    bx + bw > tx &&
+                    bx < tx + tw &&
+                    by + bh > ty &&
+                    by < ty + th
+                ) {
+                    // Do anything you want in the program when collision is detected
+                    console.log('Collision detected with ' + t[i].class);
+                    document.body.removeChild(t[i]);
+                }
             }
         }
-
         requestAnimationFrame(Utils.detectCollisions);
     }
 }))();
@@ -40,9 +57,7 @@ const Fire = (() => ({
             else Fire.stop(timer);
         }
     },
-    stop: timer => {
-        clearInterval(timer);
-    }
+    stop: timer => clearInterval(timer)
 }))();
 
 const Observer = (() => {
@@ -84,16 +99,18 @@ Observer.add(Actions.changeDirection, Actions.startAnimation);
         if (e.keyCode === 32) Fire.start();
     };
 
-    Array.from(document.querySelectorAll('.invaders__col')).forEach(col => {
-        col.innerHTML = `<div class="invader"></div>`;
-    });
+    Array.from(document.querySelectorAll('.invaders__col')).forEach(
+        (col, i) => {
+            if (i === 5) col.innerHTML = `<div class="invader"></div>`;
+        }
+    );
 
     const docReady = () => {
         p = document.getElementById('player');
         t = document.getElementsByClassName('invader');
-        b = document.querySelector('.bullet');
-
-        console.log(b.offsetWidth, b.offsetHeight, b.offsetTop, b.offsetLeft);
+        t6 = document.querySelector(`.invaders__col--6`);
+        // console.log('player: ', Utils.getRect(p));
+        // console.log('alien', Utils.getRect(t6));
 
         Utils.detectCollisions();
     };
