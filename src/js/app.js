@@ -1,79 +1,82 @@
 const player = document.querySelector('#invaders__player');
 const columns = Array.from(document.querySelectorAll('.invaders__col'));
-let reqId;
 
-const getPositionInfo = element => {
-    const { left, top, height, width } = element.getBoundingClientRect();
-    return { left, top, height, width };
-};
-
-const fire = () => {
-    player.innerHTML = `<div class="bullet"></div>`;
-    const timer = setInterval(frame, 5);
-    const bullet = player.firstElementChild;
-    let pos = 0;
-
-    function frame () {
-        if (pos > -100) bullet.style.top = --pos + 'vh';
-        else clearInterval(timer);
+const Utils = (() => ({
+    getPositionInfo: element => {
+        const { left, top, height, width } = element.getBoundingClientRect();
+        return { left, top, height, width };
     }
-};
+}))();
+
+const Fire = (() => ({
+    start: () => {
+        player.innerHTML = '<div class="bullet"></div>';
+        const bullet = player.firstElementChild;
+        const timer = setInterval(frame, 5);
+        let pos = 0;
+
+        function frame () {
+            if (pos > -100) bullet.style.top = --pos + 'vh';
+            else Fire.stop(timer);
+        }
+    },
+    stop: timer => {
+        player.innerHTML = '';
+        clearInterval(timer);
+    }
+}))();
 
 const Observer = (() => {
     const observerList = [];
-    const add = (...args) => observerList.push(...args);
-    const notify = ctx => observerList.forEach(observerFn => observerFn(ctx));
-    return { add, notify };
+
+    return {
+        add: (...args) => observerList.push(...args),
+        notify: ctx => observerList.forEach(observerFn => observerFn(ctx))
+    };
 })();
+
+let reqId;
 
 const Actions = (() => ({
     direction: null,
     pos: 500,
     changeDirection: ({ direction }) => (Actions.direction = direction),
-    move: () => {
-        const frame = Actions.direction === 'left' ? frameLeft : frameRight;
-        const timer = setInterval(frame, 5);
+    startAnimation: () => {
+        Actions.stopAnimation();
 
-        function frameLeft () {
-            if (Actions.pos > 0 && Actions.direction === 'left') {
-                player.style.left = (Actions.pos -= 2) + 'px';
-            } else clearInterval(timer);
+        if (Actions.direction === 'left') {
+            player.style.left = (player.offsetLeft -= 5) + 'px';
+        } else if (Actions.direction === 'right') {
+            player.style.left = (player.offsetLeft += 5) + 'px';
         }
-        function frameRight () {
-            if (Actions.pos < 1000 && Actions.direction === 'right') {
-                player.style.left = (Actions.pos += 2) + 'px';
-            } else clearInterval(timer);
+
+        reqId = requestAnimationFrame(Actions.startAnimation);
+
+        if (player.offsetLeft <= 0 || player.offsetLeft >= 1000) {
+            Actions.stopAnimation();
         }
+    },
+    stopAnimation: () => {
+        cancelAnimationFrame(reqId);
     }
 }))();
 
-Observer.add(Actions.changeDirection, Actions.move);
+Observer.add(Actions.changeDirection, Actions.startAnimation);
 
 (() => {
-    const onKeydown = e => {
-        if (e.keyCode === 37 && Actions.direction !== 'left')
-            Observer.notify({ direction: 'left' });
-        if (e.keyCode === 39 && Actions.direction !== 'right')
-            Observer.notify({ direction: 'right' });
-        if (e.keyCode === 32) fire();
+    const onMovePlayer = e => {
+        if (e.keyCode === 37) Observer.notify({ direction: 'left' });
+        if (e.keyCode === 39) Observer.notify({ direction: 'right' });
     };
 
-    const initEventListeners = () => {
-        window.addEventListener('keydown', onKeydown);
+    const onFire = e => {
+        if (e.keyCode === 32) Fire.start();
     };
 
-    const initInvaderColumns = () => {
-        columns.forEach(col => {
-            col.innerHTML = `<div class="invader"></div>`;
-        });
-    };
+    window.addEventListener('keydown', onMovePlayer);
+    window.addEventListener('keydown', onFire);
 
-    const initApp = () => {
-        initInvaderColumns();
-        initEventListeners();
-        const el6 = document.querySelector('.invaders__col--6').firstElementChild; // prettier-ignore
-        console.log('ALIEN', getPositionInfo(el6));
-    };
-
-    initApp();
+    columns.forEach(col => {
+        col.innerHTML = `<div class="invader"></div>`;
+    });
 })();
