@@ -1,44 +1,33 @@
 let reqId;
-let p, t, t6, pw, ph, px, py, tw, th, tx, ty;
+let p, t, i6, pw, ph, px, py, tw, th, tx, ty;
 let b, bw, bh, bx, by;
 
 const Utils = (() => ({
     getRect: element => {
-        console.log(element.getBoundingClientRect)
         const { left, top, height, width } = element.getBoundingClientRect();
         return { left, top, height, width };
     },
     detectCollisions: () => {
-        const b = p.firstElementChild;
+        for (let i = 0; i < t.length; i++) {
+            pw = p.offsetWidth;
+            ph = p.offsetHeight;
+            px = p.offsetLeft;
+            py = p.offsetTop;
+            tw = t[i].offsetWidth;
+            th = t[i].offsetHeight;
+            tx = t[i].offsetLeft;
+            ty = t[i].offsetTop;
 
-        if (b) {
-            for (let i = 0; i < t.length; i++) {
-                bw = b.offsetWidth;
-                bh = b.offsetHeight;
-                bx = b.offsetLeft;
-                by = b.offsetTop;
-                tw = t[i].offsetWidth;
-                th = t[i].offsetHeight;
-                tx = t[i].offsetLeft;
-                ty = t[i].offsetTop;
+            if (i === 0) {
+                // console.log('t', Utils.getRect(t));
+                // console.log('b', Utils.getRect(b));
+                // console.log('alien-->', tw, th, tx, ty);
+                // console.log('bullet-->', bw, bh, bx, by);
+            }
 
-                if (i === 0) {
-                    // console.log('t', Utils.getRect(t));
-                    // console.log('b', Utils.getRect(b));
-                    // console.log('alien-->', tw, th, tx, ty);
-                    console.log('bullet-->', bw, bh, bx, by);
-                }
-
-                if (
-                    bx + bw > tx &&
-                    bx < tx + tw &&
-                    by + bh > ty &&
-                    by < ty + th
-                ) {
-                    // Do anything you want in the program when collision is detected
-                    console.log('Collision detected with ' + t[i].class);
-                    document.body.removeChild(t[i]);
-                }
+            if (px + pw > tx && px < tx + tw && py + ph > ty && py < ty + th) {
+                console.log('Collision detected with ' + t[i].class);
+                document.body.removeChild(t[i]);
             }
         }
         requestAnimationFrame(Utils.detectCollisions);
@@ -53,6 +42,7 @@ const Fire = (() => ({
         let pos = 0;
 
         function frame () {
+            const { offsetHeight, offsetWidth, offsetLeft, offsetTop } = bullet;
             if (pos > -100) bullet.style.top = --pos + 'vh';
             else Fire.stop(timer);
         }
@@ -106,11 +96,8 @@ Observer.add(Actions.changeDirection, Actions.startAnimation);
     );
 
     const docReady = () => {
-        p = document.getElementById('player');
-        t = document.getElementsByClassName('invader');
-        t6 = document.querySelector(`.invaders__col--6`);
-        // console.log('player: ', Utils.getRect(p));
-        // console.log('alien', Utils.getRect(t6));
+        p = document.querySelector('#player');
+        t = document.querySelector('.invader');
 
         Utils.detectCollisions();
     };
