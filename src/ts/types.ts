@@ -4,5 +4,3 @@ export interface Rect {
     width: number;
     height: number;
 }
-
-export type Observer = (arg: any) => void;
