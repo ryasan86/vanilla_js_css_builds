@@ -43,8 +43,8 @@ ul {
     display: flex;
     flex-direction: column;
     height: calc(100% - 20px);
-    margin-bottom: 20px;
     outline: 1px solid var(--cyan-400);
+    position: relative;
     width: 1100px;
 }
 
@@ -60,21 +60,22 @@ ul {
     color: var(--cyan-400);
 }
 
-#invaders {
+#earth {
     align-items: center;
     display: flex;
     flex: 1;
     flex-direction: column;
+    overflow: hidden;
     width: 100%;
 }
 
-#invaders__col-list {
+#invader-columns {
     display: flex;
     flex: 1;
     position: relative;
 }
 
-.invaders__col {
+.invaders-col {
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -104,17 +105,16 @@ ul {
     z-index: 10;
 }
 
-#ammo {
+#gun {
     height: 100%;
-    outline: 1px solid white;
     position: relative;
     width: 100%;
 }
 
 .bullet {
     background: white;
-    height: 30px;
+    height: 20px;
     position: absolute;
-    width: 10px;
+    width: 6px;
     z-index: 999;
 }

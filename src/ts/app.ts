@@ -1,49 +1,76 @@
 import { Rect } from './types';
-import {
-    LEFT_ARROW,
-    RIGHT_ARROW,
-    DOWN_ARROW,
-    SPACE_BAR,
-    SHIP_WIDTH
-} from './constants';
+import { LEFT_ARROW, RIGHT_ARROW, DOWN_ARROW, SPACE_BAR } from './constants';
 
-const player = document.getElementById('player') as HTMLElement;
-const ammo = document.getElementById('ammo') as HTMLElement;
-const columns = document.getElementsByClassName('invaders__col');
+const earth = document.getElementById('earth') as HTMLElement;
+const columns = document.getElementsByClassName('invaders-col') as HTMLCollection; // prettier-ignore
+const gun = document.getElementById('gun') as HTMLElement;
+const bulletWidth = 6;
 
-let invaders: Element[], reqID = 0, xDir = 500; // prettier-ignore
+let invaders: Element[];
 
-const actions = {
-    moveLeft: () => {
-        actions.stopMoving();
-        player.style.left = (xDir -= 5) + 'px';
-        reqID = requestAnimationFrame(actions.moveLeft);
-        if (player.offsetLeft <= 0) actions.stopMoving();
-    },
-    moveRight: () => {
-        actions.stopMoving();
-        player.style.left = (xDir += 5) + 'px';
-        reqID = requestAnimationFrame(actions.moveRight);
-        if (player.offsetLeft >= 1010) actions.stopMoving();
-    },
-    stopMoving: () => cancelAnimationFrame(reqID),
-    fire: () => {
-        actions.addBullet();
-        const bullet = ammo.firstElementChild as HTMLElement;
-        const timer = setInterval(frame, 5);
-        let yDir = 0;
-        bullet.style.left = `${rect(player).x - SHIP_WIDTH}px`;
+class Player {
+    lives = 3;
+    score = 0;
+    xDir = 500;
+    moveID = 0;
+    player = document.createElement('div');
 
-        function frame () {
-            if (yDir > -800) bullet.style.top = `${(yDir -= 2)}px`;
-            else clearInterval(timer);
+    constructor () {
+        this.player.id = 'player';
+        this.moveLeft = this.moveLeft.bind(this);
+        this.moveRight = this.moveRight.bind(this);
+        this.stopMoving = this.stopMoving.bind(this);
+    }
+
+    moveLeft () {
+        this.stopMoving();
+        this.player.style.left = `${(this.xDir -= 5)}px`;
+        if (this.player.offsetLeft <= 0) this.stopMoving();
+        else this.moveID = requestAnimationFrame(this.moveLeft);
+    }
+
+    moveRight () {
+        this.stopMoving();
+        this.player.style.left = `${(this.xDir += 5)}px`;
+
+        if (this.player.offsetLeft >= 1010) this.stopMoving();
+        else this.moveID = requestAnimationFrame(this.moveRight);
+    }
+
+    stopMoving () {
+        if (this.moveID) cancelAnimationFrame(this.moveID);
+    }
+
+    fire () {
+        const x = this.player.offsetLeft + (this.player.offsetWidth / 2) - (bulletWidth / 2); // prettier-ignore
+        gun.innerHTML += `<div class="bullet" style="top: 0; left: ${x}px"></div>`;
+    }
+
+    html () {
+        return this.player;
+    }
+}
+
+const player: Player = new Player();
+
+const update = () => {
+    if (gun.children.length) {
+        Array.from(gun.children).forEach((bullet: any) => {
+            bullet.style.top = `${bullet.offsetTop - 5}px`;
+            detectCollisions(bullet);
+        });
+    }
+    requestAnimationFrame(update);
+};
+
+const detectCollisions = (bullet: HTMLElement) => {
+    for (const invader of invaders) {
+        if (collision(rect(bullet), rect(invader))) {
+            bullet.remove();
+            invader.remove();
+        } else if (bullet.offsetTop <= -earth.offsetHeight) {
+            bullet.remove();
         }
-    },
-    addBullet: () => {
-        const bullet = document.createElement('div');
-        bullet.classList.add('bullet');
-        // bullet.style.left = `${rect(player).x - SHIP_WIDTH}px`;
-        ammo.appendChild(bullet);
     }
 };
 
@@ -58,40 +85,29 @@ const collision = (r1: Rect, r2: Rect) => {
 
 const rect = (el: Element) => el.getBoundingClientRect();
 
-const drawInvaders = () => {
+const renderInvaders = () => {
     Array.from(columns).forEach((col: Element) => {
         col.innerHTML = '<div class="invader"></div>'.repeat(5);
     });
     invaders = Array.from(document.getElementsByClassName('invader'));
 };
 
-const onKeydown = (e: KeyboardEvent) => {
-    if (e.keyCode === LEFT_ARROW) actions.moveLeft();
-    if (e.keyCode === RIGHT_ARROW) actions.moveRight();
-    if (e.keyCode === DOWN_ARROW) actions.stopMoving();
-    if (e.keyCode === SPACE_BAR) actions.fire();
+const renderPlayer = () => {
+    (document.getElementById('player-zone') as HTMLElement).appendChild(player.html()) // prettier-ignore
 };
 
-const detectCollisions = () => {
-    const bullet = ammo.firstElementChild;
-
-    if (bullet) {
-        for (const invader of invaders) {
-            // for (const bullet of ammo.children) {
-            if (collision(rect(bullet), rect(invader))) {
-                bullet.remove();
-                invader.remove();
-            }
-            // }
-        }
-    }
-    requestAnimationFrame(detectCollisions);
+const onKeydown = (e: KeyboardEvent) => {
+    if (e.keyCode === LEFT_ARROW) player.moveLeft();
+    if (e.keyCode === RIGHT_ARROW) player.moveRight();
+    if (e.keyCode === DOWN_ARROW) player.stopMoving();
+    if (e.keyCode === SPACE_BAR) player.fire();
 };
 
 (() => {
     const docReady = () => {
-        drawInvaders();
-        detectCollisions();
+        renderInvaders();
+        renderPlayer();
+        update();
     };
 
     window.addEventListener('keydown', onKeydown);
