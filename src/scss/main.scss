@@ -51,13 +51,20 @@ ul {
 #header {
     display: flex;
     font-size: 30px;
-    justify-content: space-evenly;
     padding: 10px 0;
     width: 100%;
+
+    > div {
+        margin: 0 auto;
+        text-align: center;
+        width: 50%;
+    }
 }
 
 #score span:nth-child(2) {
     color: var(--cyan-400);
+    display: inline-block;
+    min-width: 100px;
 }
 
 #earth {

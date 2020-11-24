@@ -1,15 +1,27 @@
 import 'regenerator-runtime/runtime';
 
-import { Rect } from './types';
-import { LEFT_ARROW, RIGHT_ARROW, DOWN_ARROW, SPACE_BAR } from './constants';
+const LEFT_ARROW = 37;
+const RIGHT_ARROW = 39;
+const DOWN_ARROW = 40;
+const SPACE_BAR = 32;
 
-const earth = document.getElementById('earth') as HTMLElement;
-const columns = document.getElementsByClassName('invaders-col') as HTMLCollection; // prettier-ignore
-const gun = document.getElementById('gun') as HTMLElement;
-const score = document.getElementById('score-count') as HTMLElement;
-const bulletWidth = 6;
+// const SHIP_WIDTH = 90;
+// const SHIP_HEIGHT = 50;
+const BULLET_WIDTH = 6;
 
-let invaders: Element[];
+let invaders: HTMLCollection,
+    columns: HTMLCollection,
+    earth: HTMLElement,
+    gun: HTMLElement,
+    score: HTMLElement,
+    player: Player;
+
+interface Rect {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
 
 class Player {
     lives = 3;
@@ -20,50 +32,61 @@ class Player {
 
     constructor () {
         this.player.id = 'player';
-        this.moveLeft = this.moveLeft.bind(this);
-        this.moveRight = this.moveRight.bind(this);
-        this.stopMoving = this.stopMoving.bind(this);
     }
 
-    moveLeft () {
+    moveLeft = (): void => {
         this.stopMoving();
         this.player.style.left = `${(this.xDir -= 5)}px`;
         if (this.player.offsetLeft <= 0) this.stopMoving();
         else this.moveID = requestAnimationFrame(this.moveLeft);
-    }
+    };
 
-    moveRight () {
+    moveRight = (): void => {
         this.stopMoving();
         this.player.style.left = `${(this.xDir += 5)}px`;
         if (this.player.offsetLeft >= 1010) this.stopMoving();
         else this.moveID = requestAnimationFrame(this.moveRight);
-    }
+    };
 
-    async scorePoints () {
+    stopMoving = (): void => {
+        if (this.moveID) cancelAnimationFrame(this.moveID);
+    };
+
+    scorePoints = async (): Promise<void> => {
         for (let i = 1; i <= 10; i++) {
             this.score++;
             score.textContent = this.score.toString();
             await sleep(25);
         }
-    }
+    };
 
-    stopMoving () {
-        if (this.moveID) cancelAnimationFrame(this.moveID);
-    }
-
-    fire () {
-        const x = this.player.offsetLeft + (this.player.offsetWidth / 2) - (bulletWidth / 2); // prettier-ignore
+    fire = (): void => {
+        const x = this.player.offsetLeft + (this.player.offsetWidth / 2) - (BULLET_WIDTH / 2); // prettier-ignore
         gun.innerHTML += `<div class="bullet" style="top: 0; left: ${x}px"></div>`;
+    };
+
+    html = (): HTMLElement => {
+        return this.player;
+    };
+}
+
+class Invader {
+    invader = document.createElement('div');
+
+    constructor () {
+        this.invader.className = 'invader';
     }
 
-    html () {
-        return this.player;
+    fire = (): void => {
+        this.invader.innerHTML = '<div class="bullet"></div>';
+    };
+
+    html (): HTMLElement {
+        return this.invader;
     }
 }
 
-const player: Player = new Player();
-
-const update = () => {
+const update = (): void => {
     if (gun.children.length) {
         [...gun.children].forEach((bullet: any) => {
             bullet.style.top = `${bullet.offsetTop - 5}px`;
@@ -73,7 +96,7 @@ const update = () => {
     requestAnimationFrame(update);
 };
 
-const updateCollisions = async (bullet: HTMLElement) => {
+const updateCollisions = async (bullet: HTMLElement): Promise<void> => {
     for (const invader of invaders) {
         if (checkCollision(rectOf(bullet), rectOf(invader))) {
             bullet.remove();
@@ -86,8 +109,8 @@ const updateCollisions = async (bullet: HTMLElement) => {
     }
 };
 
-const checkCollision = (r1: Rect, r2: Rect) => {
-    return (
+const checkCollision = (r1: Rect, r2: Rect): boolean => {
+    return !!(
         r2.width &&
         r1.x + r1.width >= r2.x &&
         r1.x <= r2.x + r2.width &&
@@ -96,36 +119,90 @@ const checkCollision = (r1: Rect, r2: Rect) => {
     );
 };
 
-const onKeydown = (e: KeyboardEvent) => {
+const onKeydown = (e: KeyboardEvent): void => {
     if (e.keyCode === LEFT_ARROW) player.moveLeft();
     if (e.keyCode === RIGHT_ARROW) player.moveRight();
     if (e.keyCode === DOWN_ARROW) player.stopMoving();
     if (e.keyCode === SPACE_BAR) player.fire();
 };
 
-const rectOf = (el: Element) => {
+const rectOf = (el: Element): Rect => {
     return el.getBoundingClientRect();
 };
 
-const sleep = (ms = 0) => {
+const sleep = (ms = 0): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-const renderInvaders = () => {
-    [...columns].forEach((col: Element) => {
-        col.innerHTML = '<div class="invader"></div>'.repeat(5);
-    });
-    invaders = Array.from(document.getElementsByClassName('invader'));
+const renderContainer = (): void => {
+    document.body.innerHTML = `
+        <div id="container">
+            <div id="earth">
+                <div id="header">
+                    <div id="score">
+                        <span>SCORE:</span>&nbsp;<span id="score-count">0</span>
+                    </div>
+                    <div id="lives">
+                        <span>LIVES:</span>
+                        <ul class="lives-count"></ul>
+                    </div>
+                </div>
+
+                <div id="earth">
+                    <ul id="invader-columns">
+                        <li class="invaders-col invaders-col__1"></li>
+                        <li class="invaders-col invaders-col__2"></li>
+                        <li class="invaders-col invaders-col__3"></li>
+                        <li class="invaders-col invaders-col__4"></li>
+                        <li class="invaders-col invaders-col__5"></li>
+                        <li class="invaders-col invaders-col__6"></li>
+                        <li class="invaders-col invaders-col__7"></li>
+                        <li class="invaders-col invaders-col__8"></li>
+                        <li class="invaders-col invaders-col__9"></li>
+                        <li class="invaders-col invaders-col__10"></li>
+                        <li class="invaders-col invaders-col__11"></li>
+                    </ul>
+                    <div id="player-zone">
+                        <div id="gun"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 };
 
-const renderPlayer = () => {
+const renderInvaders = (): void => {
+    const columns = document.getElementsByClassName('invaders-col' ) as HTMLCollection; // prettier-ignore
+    const matrix = [...columns].map(() => {
+        return Array.from({ length: 5 }).map(() => new Invader());
+    });
+
+    [...columns].forEach((col: Element, i: number) => {
+        matrix[i].forEach(invader => col.appendChild(invader.html()));
+    });
+
+    // matrix.forEach(col => col.forEach(invader => invader.fire()));
+};
+
+const renderPlayer = (): void => {
     (document.getElementById('player-zone') as HTMLElement).appendChild(player.html()) // prettier-ignore
+};
+
+const queryElements = (): void => {
+    earth = document.getElementById('earth') as HTMLElement;
+    invaders = document.getElementsByClassName('invader') as HTMLCollection;
+    gun = document.getElementById('gun') as HTMLElement;
+    score = document.getElementById('score-count') as HTMLElement;
+    columns = document.getElementsByClassName('invaders-col') as HTMLCollection;
 };
 
 (() => {
     const drawGame = () => {
+        player = new Player();
+        renderContainer();
         renderInvaders();
         renderPlayer();
+        queryElements();
         update();
     };
 
