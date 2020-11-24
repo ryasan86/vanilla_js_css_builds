@@ -14,7 +14,8 @@ let invaders: HTMLCollection,
     earth: HTMLElement,
     gun: HTMLElement,
     score: HTMLElement,
-    player: Player;
+    player: Player,
+    matrix: Invader[][];
 
 interface Rect {
     x: number;
@@ -62,7 +63,11 @@ class Player {
 
     fire = (): void => {
         const x = this.player.offsetLeft + (this.player.offsetWidth / 2) - (BULLET_WIDTH / 2); // prettier-ignore
-        gun.innerHTML += `<div class="bullet" style="top: 0; left: ${x}px"></div>`;
+        gun.innerHTML += `<div class="bullet" style="top: 0; left: ${x}px;"></div>`;
+    };
+
+    query = (): HTMLElement | null => {
+        return document.getElementById('player');
     };
 
     html = (): HTMLElement => {
@@ -75,10 +80,12 @@ class Invader {
 
     constructor () {
         this.invader.className = 'invader';
+        this.invader.addEventListener('click', this.fire);
     }
 
     fire = (): void => {
-        this.invader.innerHTML = '<div class="bullet"></div>';
+        const x = (this.invader.offsetWidth / 2) - (BULLET_WIDTH / 2); // prettier-ignore
+        this.invader.innerHTML = `<div class="bullet" style="bottom: 0; left: ${x}px;"></div>`;
     };
 
     html (): HTMLElement {
@@ -86,17 +93,40 @@ class Invader {
     }
 }
 
-const update = (): void => {
+const updateOften = (): void => {
     if (gun.children.length) {
         [...gun.children].forEach((bullet: any) => {
             bullet.style.top = `${bullet.offsetTop - 5}px`;
-            updateCollisions(bullet);
+            checkIfInvaderIsHit(bullet);
         });
     }
-    requestAnimationFrame(update);
+
+    bottomInvaders().forEach((invader: any) => {
+        if (invader.children.length) {
+            [...invader.children].forEach((bullet: any) => {
+                bullet.style.top = `${bullet.offsetTop + 5}px`;
+                checkIfPlayerIsHit(bullet);
+            });
+        }
+    });
+
+    requestAnimationFrame(updateOften);
 };
 
-const updateCollisions = async (bullet: HTMLElement): Promise<void> => {
+const checkIfPlayerIsHit = async (bullet: HTMLElement): Promise<void> => {
+    const p = player.query();
+
+    if (p && checkCollision(rectOf(bullet), rectOf(p))) {
+        bullet.remove();
+        p.remove();
+    }
+    if (bullet.offsetTop >= earth.offsetHeight) {
+        console.log('bullet removed');
+        bullet.remove();
+    }
+};
+
+const checkIfInvaderIsHit = async (bullet: HTMLElement): Promise<void> => {
     for (const invader of invaders) {
         if (checkCollision(rectOf(bullet), rectOf(invader))) {
             bullet.remove();
@@ -134,6 +164,10 @@ const sleep = (ms = 0): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
 
+const bottomInvaders = () => {
+    return [...columns].map(col => col.lastElementChild);
+};
+
 const renderContainer = (): void => {
     document.body.innerHTML = `
         <div id="container">
@@ -150,17 +184,7 @@ const renderContainer = (): void => {
 
                 <div id="earth">
                     <ul id="invader-columns">
-                        <li class="invaders-col invaders-col__1"></li>
-                        <li class="invaders-col invaders-col__2"></li>
-                        <li class="invaders-col invaders-col__3"></li>
-                        <li class="invaders-col invaders-col__4"></li>
-                        <li class="invaders-col invaders-col__5"></li>
-                        <li class="invaders-col invaders-col__6"></li>
-                        <li class="invaders-col invaders-col__7"></li>
-                        <li class="invaders-col invaders-col__8"></li>
-                        <li class="invaders-col invaders-col__9"></li>
-                        <li class="invaders-col invaders-col__10"></li>
-                        <li class="invaders-col invaders-col__11"></li>
+                        ${`<li class="invaders-col"></li>`.repeat(11)}
                     </ul>
                     <div id="player-zone">
                         <div id="gun"></div>
@@ -172,16 +196,15 @@ const renderContainer = (): void => {
 };
 
 const renderInvaders = (): void => {
-    const columns = document.getElementsByClassName('invaders-col' ) as HTMLCollection; // prettier-ignore
-    const matrix = [...columns].map(() => {
+    columns = document.getElementsByClassName('invaders-col' ) as HTMLCollection; // prettier-ignore
+
+    matrix = [...columns].map(() => {
         return Array.from({ length: 5 }).map(() => new Invader());
     });
 
     [...columns].forEach((col: Element, i: number) => {
         matrix[i].forEach(invader => col.appendChild(invader.html()));
     });
-
-    // matrix.forEach(col => col.forEach(invader => invader.fire()));
 };
 
 const renderPlayer = (): void => {
@@ -193,7 +216,6 @@ const queryElements = (): void => {
     invaders = document.getElementsByClassName('invader') as HTMLCollection;
     gun = document.getElementById('gun') as HTMLElement;
     score = document.getElementById('score-count') as HTMLElement;
-    columns = document.getElementsByClassName('invaders-col') as HTMLCollection;
 };
 
 (() => {
@@ -203,7 +225,8 @@ const queryElements = (): void => {
         renderInvaders();
         renderPlayer();
         queryElements();
-        update();
+
+        updateOften();
     };
 
     window.addEventListener('keydown', onKeydown);

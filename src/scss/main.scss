@@ -92,6 +92,8 @@ ul {
 .invader {
     @include base-ship;
 
+    position: relative;
+
     &:not(:first-child) {
         margin-top: 10px;
     }
