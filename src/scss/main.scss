@@ -76,13 +76,13 @@ ul {
     width: 100%;
 }
 
-#invader-columns {
+#invader-column-list {
     display: flex;
     flex: 1;
     position: relative;
 }
 
-.invaders-col {
+.invader-column {
     align-items: center;
     display: flex;
     flex-direction: column;
