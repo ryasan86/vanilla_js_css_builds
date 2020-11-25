@@ -43,6 +43,7 @@ ul {
     display: flex;
     flex-direction: column;
     height: calc(100% - 20px);
+    margin: 0 auto;
     outline: 1px solid var(--cyan-400);
     position: relative;
     width: 1100px;
@@ -51,20 +52,16 @@ ul {
 #header {
     display: flex;
     font-size: 30px;
+    justify-content: space-around;
     padding: 10px 0;
     width: 100%;
-
-    > div {
-        margin: 0 auto;
-        text-align: center;
-        width: 50%;
-    }
 }
 
 #score span:nth-child(2) {
     color: var(--cyan-400);
     display: inline-block;
     min-width: 100px;
+    text-align: center;
 }
 
 #earth {
@@ -126,4 +123,29 @@ ul {
     position: absolute;
     width: 6px;
     z-index: 999;
+}
+
+#btn-group {
+    display: flex;
+    justify-content: space-between;
+    width: 215px;
+}
+
+.btn {
+    background: 0;
+    border: 1px solid var(--cyan-400);
+    border-radius: 3px;
+    color: var(--cyan-400);
+    cursor: pointer;
+    height: 50px;
+    width: 50px;
+
+    &:hover {
+        background: var(--cyan-400);
+        color: var(--black-600);
+    }
+
+    &--wide {
+        width: 100px;
+    }
 }

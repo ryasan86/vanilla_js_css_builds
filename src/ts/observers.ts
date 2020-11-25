@@ -1,16 +1,19 @@
-type Func = (...args: any) => any;
-type Context = any;
+type Fn = (...args: any) => any;
 
-class Observers {
-    observerList: Func[] = [];
+class Observer {
+    observerList: Fn[] = [];
 
-    add = (func: Func): void => {
-        this.observerList.push(func);
+    subscribe = (fn: Fn): void => {
+        this.observerList.push(fn);
     };
 
-    notify = (context: Context): void => {
-        this.observerList.forEach(func => func(context));
+    unsubscribe = (fnToRemove: Fn): void => {
+        this.observerList.filter(fn => fn !== fnToRemove);
+    };
+
+    notify = (context: any): void => {
+        this.observerList.forEach((fn: any) => fn(context));
     };
 }
 
-export default Observers;
+export const subject = new Observer();

@@ -3,6 +3,7 @@ import 'regenerator-runtime/runtime';
 import Player from './player';
 import Invaders from './invaders';
 import State from './state';
+import Controls from './controls';
 
 // prettier-ignore
 const LEFT_ARROW = 37,
@@ -15,23 +16,30 @@ const LEFT_ARROW = 37,
 // prettier-ignore
 export let player: Player,
            invaders: Invaders,
+           state: State,
+           controls: Controls,
+           container: HTMLElement,
            columns: HTMLCollection,
-           earth: HTMLElement,
-           state: State;
+           btnGroup: HTMLElement,
+           earth: HTMLElement;
 
 export const center = (SHIP_WIDTH / 2) - (BULLET_WIDTH / 2); // prettier-ignore
 
 const onKeydown = (e: KeyboardEvent): void => {
-    if (e.keyCode === LEFT_ARROW) player.moveLeft();
-    if (e.keyCode === RIGHT_ARROW) player.moveRight();
-    if (e.keyCode === DOWN_ARROW) player.stopMoving();
-    if (e.keyCode === SPACE_BAR) player.fire();
+    if (!state.isPaused) {
+        if (e.keyCode === LEFT_ARROW) player.moveLeft();
+        if (e.keyCode === RIGHT_ARROW) player.moveRight();
+        if (e.keyCode === DOWN_ARROW) player.stopMoving();
+        if (e.keyCode === SPACE_BAR) player.fire();
+    }
 };
 
 const initHTML = () => {
     document.body.innerHTML = `
         <div id="container">
             <div id="header">
+                <div id="btn-group">
+                </div>
                 <div id="score">
                     <span>SCORE:</span>&nbsp;<span id="score-count">0</span>
                 </div>
@@ -52,14 +60,19 @@ const initHTML = () => {
         </div>
     `;
 
+    container = document.getElementById('container') as HTMLElement;
+    btnGroup = document.getElementById('btn-group') as HTMLElement;
     earth = document.getElementById('earth') as HTMLElement;
     columns = document.getElementsByClassName('invader-column') as HTMLCollection; // prettier-ignore
 };
 
-const loadGame = () => {
+export const loadGame = (): void => {
     initHTML();
 
     state = new State();
+
+    controls = new Controls();
+    controls.renderBtns();
 
     invaders = new Invaders();
     invaders.render();
@@ -70,8 +83,7 @@ const loadGame = () => {
     player.update();
 
     window.addEventListener('keydown', onKeydown);
-    window.addEventListener('blur', () => state.setPause(true));
-    window.addEventListener('focus', () => state.setPause(false));
+    window.addEventListener('blur', controls.pause);
 };
 
 window.addEventListener('load', loadGame);

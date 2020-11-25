@@ -1,5 +1,6 @@
 class State {
-    isPaused = false;
+    isPaused = true;
+    gameIsOver = false;
 
     togglePause = (): void => {
         this.isPaused = !this.isPaused;
@@ -7,6 +8,10 @@ class State {
 
     setPause = (bool: boolean): void => {
         this.isPaused = bool;
+    };
+
+    setGameIsOver = (bool: boolean): void => {
+        this.gameIsOver = bool;
     };
 }
 

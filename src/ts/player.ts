@@ -1,4 +1,4 @@
-import { center, player, earth } from './app';
+import { center, player, earth, state } from './app';
 import { sleep, rectOf, checkCollision } from './utils';
 import { invaderElements } from './invaders';
 
@@ -20,9 +20,8 @@ class Player {
     moveLeft = (): void => {
         this.stopMoving();
 
-        if (this.node.offsetLeft <= 0) {
-            return;
-        } else {
+        if (this.node.offsetLeft <= 0 || state.isPaused) return;
+        else {
             this.node.style.left = `${(this.x -= 5)}px`;
             this.moveID = requestAnimationFrame(this.moveLeft);
         }
@@ -31,9 +30,8 @@ class Player {
     moveRight = (): void => {
         this.stopMoving();
 
-        if (this.node.offsetLeft >= 1010) {
-            return;
-        } else {
+        if (this.node.offsetLeft >= 1010 || state.isPaused) return;
+        else {
             this.node.style.left = `${(this.x += 5)}px`;
             this.moveID = requestAnimationFrame(this.moveRight);
         }
@@ -56,7 +54,7 @@ class Player {
         this.gun.innerHTML += `<div class="bullet" style="top: 0; left: ${x}px;"></div>`;
     };
 
-    checkIfInvaderIsHit = async (bullet: HTMLElement): Promise<void> => {
+    checkForInvaderHit = async (bullet: HTMLElement): Promise<void> => {
         if (invaderElements?.length) {
             for (const invader of invaderElements) {
                 if (checkCollision(rectOf(bullet), rectOf(invader))) {
@@ -76,7 +74,7 @@ class Player {
         if (this.gun.children.length) {
             [...this.gun.children].forEach((bullet: any) => {
                 bullet.style.top = `${bullet.offsetTop - 5}px`;
-                this.checkIfInvaderIsHit(bullet);
+                this.checkForInvaderHit(bullet);
             });
         }
 
