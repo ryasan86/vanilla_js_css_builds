@@ -1,6 +1,6 @@
-import { columns, earth, center, state } from './app';
-import { playerElement } from './player';
-import { rectOf, checkCollision, random } from './utils';
+import { columns, state, ROW_LENGTH, COLUMN_LENGTH } from './app';
+import { random } from './utils';
+import Invader from './invader';
 
 export let invaderElements: HTMLCollection;
 export let interval: number;
@@ -11,79 +11,53 @@ const speed = {
     fast: 500
 };
 
-class Invaders {
-    bottomInvaders: (Element | null)[];
-    randomInvader: Element | null;
+const createMatrix = () => {
+    const matrix: any[] = [];
+    let arr;
 
-    constructor () {
-        this.bottomInvaders = this.freshBottomInvaders();
-        this.randomInvader = null;
+    for (let i = 0; i < COLUMN_LENGTH - 1; i++) {
+        arr = [];
+
+        for (let j = 0; j < ROW_LENGTH; j++) {
+            arr.push(new Invader(i, j));
+        }
+
+        matrix.push(arr);
     }
 
-    freshBottomInvaders = (): (Element | null)[] => {
-        return [...columns].slice(0, -1).map(col => col.lastElementChild);
+    return matrix;
+};
+
+class Invaders {
+    matrix = createMatrix();
+
+    updateBottom = (): any[] => {
+        return this.matrix.map(column => {
+            return column[ROW_LENGTH - 1];
+        });
     };
 
-    checkForPlayerHit = async (bullet: HTMLElement): Promise<void> => {
-        if (playerElement) {
-            if (checkCollision(rectOf(bullet), rectOf(playerElement))) {
-                bullet.remove();
-                playerElement.remove();
-            }
-
-            if (bullet.offsetTop >= earth.offsetHeight) {
-                bullet.remove();
-            }
-        }
-    };
-
-    // updateBullets = (): void => {
-    //     if (!state.isPaused) {
-    //         this.bottomInvaders.forEach((invader: any) => {
-    //             if (invader?.children.length) {
-    //                 [...invader.children].forEach((bullet: any) => {
-    //                     bullet.style.top = `${bullet.offsetTop + 5}px`;
-    //                     this.checkForPlayerHit(bullet);
-    //                 });
-    //             }
-    //         });
-    //         this.bottomInvaders = this.freshBottomInvaders();
-    //     }
-
-    //     requestAnimationFrame(this.updateBullets);
-    // };
-
-    updateBullets = (): void => {
+    randomAttack = (): void => {
         if (!state.isPaused) {
-            if (this.randomInvader) {
-                [...this.randomInvader.children].forEach((bullet: any) => {
-                    bullet.style.top = `${bullet.offsetTop + 5}px`;
-                });
-            }
-        }
-
-        requestAnimationFrame(this.updateBullets);
-    };
-
-    addBulletToRandom = (): void => {
-        if (!state.isPaused) {
-            this.randomInvader = columns[random(0, 9)].lastElementChild;
-            if (this.randomInvader) {
-                this.randomInvader.innerHTML += `<div class="bullet" style="bottom: 0; left: ${center}px;"></div>`;
-            }
+            const bottomInvaders: Invader[] = this.updateBottom();
+            bottomInvaders[random(0, COLUMN_LENGTH - 2)].fire();
         }
     };
 
     update = (): void => {
-        this.updateBullets();
-        interval = setInterval(this.addBulletToRandom, speed.slow);
+        setInterval(this.randomAttack, speed.normal);
     };
 
     render = (): void => {
-        [...columns].slice(1).forEach((_, i) => {
-            columns[i].innerHTML = '<div class="invader"></div>'.repeat(5);
+        const cols = [...columns].slice(0, -1);
+
+        this.matrix.forEach((invaders, i) => {
+            const children = invaders.map((invader: Invader) => {
+                return invader.render();
+            });
+
+            cols[i].append(...children);
         });
-        invaderElements = document.getElementsByClassName('invader') as HTMLCollection; // prettier-ignore
     };
 }
 

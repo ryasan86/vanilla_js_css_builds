@@ -30,16 +30,20 @@ class Controls {
 
         decorateWide(this.playBtn);
         this.playBtn.addEventListener('click', () => {
-            state.setPause(false);
-            btnGroup.appendChild(this.pauseBtn);
-            btnGroup.removeChild(this.playBtn);
+            if (btnGroup.contains(this.playBtn)) {
+                state.setPause(false);
+                btnGroup.appendChild(this.pauseBtn);
+                btnGroup.removeChild(this.playBtn);
+            }
         });
 
         decorateWide(this.pauseBtn);
         this.pauseBtn.addEventListener('click', () => {
-            state.setPause(true);
-            btnGroup.appendChild(this.playBtn);
-            btnGroup.removeChild(this.pauseBtn);
+            if (btnGroup.contains(this.pauseBtn)) {
+                state.setPause(true);
+                btnGroup.appendChild(this.playBtn);
+                btnGroup.removeChild(this.pauseBtn);
+            }
         });
     }
 

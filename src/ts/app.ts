@@ -6,12 +6,14 @@ import State from './state';
 import Controls from './controls';
 
 // prettier-ignore
-const LEFT_ARROW = 37,
-      RIGHT_ARROW = 39,
-      DOWN_ARROW = 40,
-      SPACE_BAR = 32,
-      SHIP_WIDTH = 90,
-      BULLET_WIDTH = 6;
+export const LEFT_ARROW = 37,
+             RIGHT_ARROW = 39,
+             DOWN_ARROW = 40,
+             SPACE_BAR = 32,
+             SHIP_WIDTH = 90,
+             BULLET_WIDTH = 6,
+             COLUMN_LENGTH = 11,
+             ROW_LENGTH = 5;
 
 // prettier-ignore
 export let player: Player,
