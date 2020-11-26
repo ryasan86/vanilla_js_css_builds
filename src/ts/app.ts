@@ -82,7 +82,6 @@ export const loadGame = (): void => {
 
     player = new Player();
     player.render();
-    player.update();
 
     window.addEventListener('keydown', onKeydown);
     window.addEventListener('blur', controls.pause);

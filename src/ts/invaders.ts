@@ -11,7 +11,9 @@ const speed = {
     fast: 500
 };
 
-const createMatrix = () => {
+type Matrix = Invaders[][];
+
+const createMatrix = (): Matrix => {
     const matrix: any[] = [];
     let arr;
 
@@ -29,19 +31,33 @@ const createMatrix = () => {
 };
 
 class Invaders {
-    matrix = createMatrix();
+    matrix: Matrix;
+
+    constructor () {
+        this.matrix = createMatrix();
+    }
 
     updateBottom = (): any[] => {
         return this.matrix.map(column => {
-            return column[ROW_LENGTH - 1];
+            return column[column.length - 1];
         });
     };
 
     randomAttack = (): void => {
         if (!state.isPaused) {
             const bottomInvaders: Invader[] = this.updateBottom();
-            bottomInvaders[random(0, COLUMN_LENGTH - 2)].fire();
+            const idx = random(0, COLUMN_LENGTH - 2);
+            if (bottomInvaders[idx]) {
+                bottomInvaders[idx].fire();
+            }
         }
+    };
+
+    removeInvader = (invader: Invader): void => {
+        const [col, row] = invader.coordinates;
+
+        this.matrix[col].splice(row, 1);
+        invader.remove();
     };
 
     update = (): void => {
@@ -50,27 +66,17 @@ class Invaders {
 
     render = (): void => {
         const cols = [...columns].slice(0, -1);
+        let children: Element[];
 
         this.matrix.forEach((invaders, i) => {
-            const children = invaders.map((invader: Invader) => {
+            children = invaders.map((invader: any) => {
                 return invader.render();
             });
-
             cols[i].append(...children);
         });
+
+        invaderElements = document.getElementsByClassName('invader') as HTMLCollection; // prettier-ignore
     };
 }
 
 export default Invaders;
-
-// moveRight = (): void => {
-//     // move right
-// };
-
-// moveLeft = (): void => {
-//     // move left
-// };
-
-// moveDown = (): void => {
-//     // move down
-// };
