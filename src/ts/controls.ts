@@ -55,7 +55,7 @@ class Controls {
         this.playBtn.click();
     };
 
-    renderBtns = (): void => {
+    render = (): void => {
         btnGroup.append(this.resetBtn, this.playBtn);
     };
 }

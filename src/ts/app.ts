@@ -62,10 +62,10 @@ const initHTML = () => {
         </div>
     `;
 
+    columns = document.getElementsByClassName('invader-column') as HTMLCollection; // prettier-ignore
     container = document.getElementById('container') as HTMLElement;
     btnGroup = document.getElementById('btn-group') as HTMLElement;
     earth = document.getElementById('earth') as HTMLElement;
-    columns = document.getElementsByClassName('invader-column') as HTMLCollection; // prettier-ignore
 };
 
 export const loadGame = (): void => {
@@ -74,7 +74,7 @@ export const loadGame = (): void => {
     state = new State();
 
     controls = new Controls();
-    controls.renderBtns();
+    controls.render();
 
     invaders = new Invaders();
     invaders.render();

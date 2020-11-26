@@ -11,6 +11,7 @@ class State {
     };
 
     setGameIsOver = (bool: boolean): void => {
+        this.setPause(bool);
         this.gameIsOver = bool;
     };
 }

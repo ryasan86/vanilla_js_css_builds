@@ -2,7 +2,6 @@ import { columns, state, ROW_LENGTH, COLUMN_LENGTH } from './app';
 import { random } from './utils';
 import Invader from './invader';
 
-export let invaderElements: HTMLCollection;
 export let interval: number;
 
 const speed = {
@@ -47,6 +46,7 @@ class Invaders {
         if (!state.isPaused) {
             const bottomInvaders: Invader[] = this.updateBottom();
             const idx = random(0, COLUMN_LENGTH - 2);
+
             if (bottomInvaders[idx]) {
                 bottomInvaders[idx].fire();
             }
@@ -70,12 +70,11 @@ class Invaders {
 
         this.matrix.forEach((invaders, i) => {
             children = invaders.map((invader: any) => {
-                return invader.render();
+                return (invader as Invader).element();
             });
+
             cols[i].append(...children);
         });
-
-        invaderElements = document.getElementsByClassName('invader') as HTMLCollection; // prettier-ignore
     };
 }
 

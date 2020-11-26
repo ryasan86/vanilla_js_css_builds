@@ -1,73 +1,6 @@
-import Invader from './invader';
-import { center, earth, state, player, invaders } from './app';
-import { sleep, rectOf, checkCollision } from './utils';
-import { invaderElements } from './invaders';
-
-export let playerElement: HTMLElement;
-
-class PlayerBullet {
-    node = document.createElement('div');
-    bullets: PlayerBullet[];
-
-    constructor (x: number, bullets: PlayerBullet[]) {
-        this.node.className = 'bullet';
-        this.node.style.cssText = `top: 0; left: ${x}px`;
-        this.bullets = bullets;
-    }
-
-    remove = (): void => {
-        this.bullets.splice(this.bullets.indexOf(this), 1);
-        this.node.remove();
-    };
-
-    checkForHitOnInvader = (): void => {
-        let invader: Invader | undefined;
-
-        for (const i in invaders.matrix) {
-            for (const j in invaders.matrix) {
-                invader = invaders?.matrix[i][j];
-
-                if (
-                    invader &&
-                    checkCollision(rectOf(this.node), rectOf(invader.render()))
-                ) {
-                    this.remove();
-                    player.scorePoints();
-                    invaders.removeInvader(invader);
-                }
-
-                if (this.node.offsetTop <= -earth.offsetHeight) {
-                    this.remove();
-                }
-            }
-        }
-    };
-
-    update = (): void => {
-        if (!state.isPaused) {
-            this.node.style.top = `${this.node.offsetTop - 5}px`;
-            this.checkForHitOnInvader();
-        }
-        requestAnimationFrame(this.update);
-    };
-
-    render = (): HTMLElement => {
-        return this.node;
-    };
-}
-
-// if (invaderElements?.length) {
-//     for (const invader of invaderElements) {
-//         if (checkCollision(rectOf(this.node), rectOf(invader))) {
-//             this.remove();
-//             invaders.removeInvader(invader)
-//             player.scorePoints();
-//         }
-//         if (this.node.offsetTop <= -earth.offsetHeight) {
-//             this.remove();
-//         }
-//     }
-// }
+import PlayerBullet from './player-bullet';
+import { center, state } from './app';
+import { sleep } from './utils';
 
 class Player {
     lives = 3;
@@ -88,9 +21,7 @@ class Player {
 
     moveLeft = (): void => {
         this.stopMoving();
-
-        if (this.node.offsetLeft <= 0 || state.isPaused) return;
-        else {
+        if (this.node.offsetLeft > 0 && !state.isPaused) {
             this.node.style.left = `${(this.x -= 5)}px`;
             this.moveID = requestAnimationFrame(this.moveLeft);
         }
@@ -98,9 +29,7 @@ class Player {
 
     moveRight = (): void => {
         this.stopMoving();
-
-        if (this.node.offsetLeft >= 1010 || state.isPaused) return;
-        else {
+        if (this.node.offsetLeft < 1010 && !state.isPaused) {
             this.node.style.left = `${(this.x += 5)}px`;
             this.moveID = requestAnimationFrame(this.moveRight);
         }
@@ -127,14 +56,17 @@ class Player {
 
     update = (): void => {
         if (this.bullet) {
-            this.gun.appendChild(this.bullet.render());
+            this.gun.appendChild(this.bullet.element());
             this.bullet.update();
         }
     };
 
+    element = (): HTMLElement => {
+        return this.node;
+    };
+
     render = (): void => {
         (document.getElementById('player-zone') as HTMLElement).appendChild(this.node) // prettier-ignore
-        playerElement = this.node;
     };
 }
 
