@@ -1,10 +1,5 @@
-import Text from './modules/text';
-import SliderList from './modules/slide-list';
-import SliderItem from './modules/slider-item';
-import Utils from './modules/utils';
-
 // prettier-ignore
-const movies = [
+export default [
     {
         image: 'https://i.postimg.cc/cJgKvhQ7/joker.jpg',
         title: 'Joker',
@@ -96,55 +91,3 @@ const movies = [
         synopsis: "In Steven Spielberg's massive blockbuster, paleontologists Alan Grant (Sam Neill) and Ellie Sattler (Laura Dern) and mathematician Ian Malcolm (Jeff Goldblum) are among a select group chosen to tour an island theme park populated by dinosaurs created from prehistoric DNA. While the park's mastermind, billionaire John Hammond (Richard Attenborough), assures everyone that the facility is safe, they find out otherwise when various ferocious predators break free and go on the hunt.",
     },
 ];
-
-// prettier-ignore
-(() => {
-    const {$} = Utils;
-    const text = $('.text'), 
-          slider = $('.slider');
-
-    const state = {
-        activeMovie: movies[0],
-        step: 0,
-    };
-
-    const createSlides = (movies) => {
-        return SliderList.html({movies});
-    };
-
-    const createText = (movie) => {
-        return Text.html({...movie});
-    };
-
-    const updateSlide = (c, i) => {
-        const p = (i + movies.length - 1) % movies.length;
-        c.style.transform = `translateX(${45 + 15 * p}rem)`;
-    };
-
-    const rotate = () => {
-        const sliderList = $('.slider__list');
-        const tail = movies.length - 1;
-        const newChild = SliderItem.html({
-            styles: {
-                transform: `translateX(${tail === 0 ? 45 : 45 + 15 * tail}rem)`,
-            },
-            src: state.activeMovie.image,
-        });
-
-        state.step = (state.step + 1) % movies.length;
-        state.activeMovie = movies[state.step];
-
-        Array.from(sliderList.children).forEach(updateSlide);
-        sliderList.removeChild(sliderList.children[0]);
-        sliderList.insertAdjacentHTML('beforeend', newChild);
-        text.innerHTML = createText(state.activeMovie);
-    };
-
-    const initApp = () => {
-        slider.innerHTML = createSlides(movies);
-        text.innerHTML = createText(state.activeMovie);
-        $('.btn').addEventListener('click', rotate);
-    };
-
-    initApp();
-})();

@@ -1,10 +1,19 @@
+// prettier-ignore
 :root {
     --box-shadow-top: 0 -0.4rem 1rem rgba(20, 20, 20, 0.7);
-    --box-shadow-xs: 0 0.1rem 0.3rem rgba(0, 0, 0, 0.48), 0 0.1rem 0.2rem rgba(0, 0, 0, 0.96);
-    --box-shadow-sm: 0 0.3rem 0.6rem rgba(0, 0, 0, 0.64), 0 0.3rem 0.6rem rgba(0, 0, 0, 0.92);
-    --box-shadow-md: 0 1rem 2rem rgba(0, 0, 0, 0.76), 0 0.6rem 0.6rem rgba(0, 0, 0, 0.92);
+    --box-shadow-xs:
+        0 0.1rem 0.3rem rgba(0, 0, 0, 0.48),
+        0 0.1rem 0.2rem rgba(0, 0, 0, 0.96);
+    --box-shadow-sm:
+        0 0.3rem 0.6rem rgba(0, 0, 0, 0.64),
+        0 0.3rem 0.6rem rgba(0, 0, 0, 0.92);
+    --box-shadow-md:
+        0 1rem 2rem rgba(0, 0, 0, 0.76),
+        0 0.6rem 0.6rem rgba(0, 0, 0, 0.92);
     --box-shadow-lg: 0 1.4rem 2.8rem black, 0 1rem 1rem rgba(0, 0, 0, 0.88);
-    --box-shadow-xlg: 0 1.9rem 3.8rem rgba(0, 0, 0, 1.2), 0 1.5rem 1.2rem rgba(0, 0, 0, 0.88);
+    --box-shadow-xlg:
+        0 1.9rem 3.8rem rgba(0, 0, 0, 1.2),
+        0 1.5rem 1.2rem rgba(0, 0, 0, 0.88);
     --font-size-sm: 1.2rem;
     --font-size-md: 1.8rem;
     --font-size-lg: 2.4rem;
@@ -23,20 +32,20 @@
     --red-A200: #ff5252;
     --red-A400: #ff1744;
     --red-A700: #d50000;
-    --pink-50: #fce4ec;
-    --pink-100: #f8bbd0;
-    --pink-200: #f48fb1;
-    --pink-300: #f06292;
-    --pink-400: #ec407a;
-    --pink-500: #e91e63;
-    --pink-600: #d81b60;
-    --pink-700: #c2185b;
-    --pink-800: #ad1457;
-    --pink-900: #880e4f;
-    --pink-A100: #ff80ab;
-    --pink-A200: #ff4081;
-    --pink-A400: #f50057;
-    --pink-A700: #c51162;
+    --Recipek-50: #fce4ec;
+    --Recipek-100: #f8bbd0;
+    --Recipek-200: #f48fb1;
+    --Recipek-300: #f06292;
+    --Recipek-400: #ec407a;
+    --Recipek-500: #e91e63;
+    --Recipek-600: #d81b60;
+    --Recipek-700: #c2185b;
+    --Recipek-800: #ad1457;
+    --Recipek-900: #880e4f;
+    --Recipek-A100: #ff80ab;
+    --Recipek-A200: #ff4081;
+    --Recipek-A400: #f50057;
+    --Recipek-A700: #c51162;
     --purple-50: #f3e5f5;
     --purple-100: #e1bee7;
     --purple-200: #ce93d8;

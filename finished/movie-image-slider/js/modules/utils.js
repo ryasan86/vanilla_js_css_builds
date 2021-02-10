@@ -5,7 +5,11 @@ const UtilsModule = (() => {
             .join(' ');
     };
 
-    return { styles };
+    const $ = (selector) => {
+        return document.querySelector(selector);
+    }
+
+    return { styles, $ };
 })();
 
 export default UtilsModule;

@@ -8,6 +8,7 @@
         "build": "parcel build src/index.html --public-url ./"
     },
     "dependencies": {
+        "jsdom": "^16.4.0",
         "stylelint": "^13.7.0",
         "stylelint-config-sass-guidelines": "^7.1.0",
         "stylelint-config-standard": "^20.0.0"

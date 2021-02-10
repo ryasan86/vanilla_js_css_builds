@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Playground</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+    <link rel="stylesheet" href="./scss/main.scss" />
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+</head>
+
+<body>
+
+    <div class="app" x-data="app()">
+        <div class="phone">
+            <div class="face">
+                <div class="face__inner">
+                    <div class="header">
+                        <i class="fas fa-align-left fa-2x header__btn header__btn--menu"></i>
+                        <h1 class="header__title">Folder</h1>
+                        <i class="fas fa-search fa-2x header__btn header__btn--search"></i>
+                    </div>
+                    <div class="tabs">
+                        <div class="highlighter"
+                             :class="{ left: currentTab === 'MY_DRIVE', right:  currentTab === 'SHARED_DRIVE' }">
+                        </div>
+                        <div class="tab" :class="{ active: currentTab === 'MY_DRIVE' }"
+                             @click="setCurrentTab('MY_DRIVE')">
+                            My Drive
+                        </div>
+                        <div class="tab" :class="{ active: currentTab === 'SHARED_DRIVE' }"
+                             @click="setCurrentTab('SHARED_DRIVE')">
+                            Shared Drive
+                        </div>
+                    </div>
+                    <ul class="folder-list">
+                        <template x-for="folder in folderList">
+                            <li class="folder">
+                                <div class="folder__header">
+                                    <i class="fas fa-folder fa-4x"></i>
+                                </div>
+                                <div class="folder__body">
+                                    <div class="folder__title" x-text="folder.title"></div>
+                                    <div class="folder__file-count" x-text="folder.fileCount"></div>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+            <div class="base"></div>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/59200df0ab.js" crossorigin="anonymous"></script>
+    <script src="./ts/app.ts"></script>
+</body>
+
+</html>
